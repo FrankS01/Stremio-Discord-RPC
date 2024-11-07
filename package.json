@@ -1,0 +1,11 @@
+{
+	"name": "stremio-addon-Discord",
+	"version": "0.0.1",
+	"description": "Show what you are watching on Discord",
+	"scripts": {
+		"start": "node server.js"
+	},
+	"dependencies": {
+		"stremio-addon-sdk": "1.1.x"
+	}
+}
