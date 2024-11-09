@@ -15,7 +15,8 @@ const manifest = {
 		"series"
 	],
 	"name": "Discord Rich Presence",
-	"description": "Show the movie or series you are watching on Stremio as your Discord status"
+	"description": "Show the movie or series you are watching on Stremio as your Discord status",
+	"logo": "https://i.ibb.co/kGHhqr2/discord-mark-blue.png"
 };
 
 const builder = new addonBuilder(manifest);
