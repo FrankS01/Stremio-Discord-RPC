@@ -5,7 +5,7 @@ const { setActivity } = require("./src/discordRPC");
 // Docs: https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/responses/manifest.md
 const manifest = {
 	"id": "dev.frankstam.stremio-discord-rpc",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"catalogs": [],
 	"resources": [
 		"stream",
