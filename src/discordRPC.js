@@ -9,11 +9,11 @@ client.on("ready", () => {
 
 client.login({ clientId }).catch(console.error);
 
-async function setActivity(title, itemType, seasonNumber, episodeNumber, episodeTitle) {
+async function setActivity(title, itemType, imageUrl, seasonNumber, episodeNumber, episodeTitle) {
     if (!client) return;
     let presence = {
         details: `${title}`,
-        largeImageKey: "stremio",
+        largeImageKey: imageUrl,
         instance: false,
     };
 
@@ -30,6 +30,11 @@ async function setActivity(title, itemType, seasonNumber, episodeNumber, episode
     logStatus(presence)
 }
 
+async function clearActivity() {
+    console.log("Clearing Discord status")
+    client.clearActivity()
+}
+
 function logStatus(presence) {
     console.log("===================")
     console.log("Stremio")
@@ -38,4 +43,4 @@ function logStatus(presence) {
     console.log("===================")
 }
 
-module.exports = { setActivity };
+module.exports = { setActivity, clearActivity };
