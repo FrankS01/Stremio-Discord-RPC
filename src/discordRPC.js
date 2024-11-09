@@ -1,10 +1,10 @@
-const RPC = require("discord-rpc");
+const rpc = require("discord-rpc");
 const clientId = "1304184351763730472";
 
-const rpc = new RPC.Client({ transport: "ipc" });
+const client = new rpc.Client({ transport: "ipc" });
 
 async function setActivity(title, itemType, seasonNumber, episodeNumber, episodeTitle) {
-    if (!rpc) return;
+    if (!client) return;
     let presence = {
         details: `${title}`,
         largeImageKey: "stremio",
@@ -18,13 +18,13 @@ async function setActivity(title, itemType, seasonNumber, episodeNumber, episode
     else if (itemType === "series") {
         presence.state = `S${seasonNumber}E${episodeNumber}: ${episodeTitle}`
     }
-    rpc.setActivity(presence);
+    client.setActivity(presence);
 }
 
-rpc.on("ready", () => {
+client.on("ready", () => {
     console.log("Connected to Discord!");
 });
 
-rpc.login({ clientId }).catch(console.error);
+client.login({ clientId }).catch(console.error);
 
 module.exports = { setActivity };

@@ -1,9 +1,11 @@
 {
-	"name": "stremio-addon-Discord",
-	"version": "0.0.1",
-	"description": "Show what you are watching on Discord",
+	"name": "stremio-discord-rpc",
+	"version": "1.0.0",
+	"description": "Show the movie or series you are watching on Stremio as your Discord status",
 	"scripts": {
-		"start": "node server.js"
+		"start": "node server.js",
+		"start:desktop": "npm start -- --install",
+		"start:web": "npm start -- --launch"
 	},
 	"dependencies": {
 		"discord-rpc": "^4.0.1",

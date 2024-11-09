@@ -1,10 +1,10 @@
-const { addonBuilder } = require("stremio-addon-sdk")
-const needle = require('needle')
+const { addonBuilder } = require("stremio-addon-sdk");
+const needle = require('needle');
 const { setActivity } = require("./src/discordRPC");
 
 // Docs: https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/responses/manifest.md
 const manifest = {
-	"id": "community.DiscordRPC",
+	"id": "dev.frankstam.stremio-discord-rpc",
 	"version": "0.0.1",
 	"catalogs": [],
 	"resources": [
@@ -15,60 +15,54 @@ const manifest = {
 		"series"
 	],
 	"name": "Discord Rich Presence",
-	"description": "Show what you are watching on Discord"
-}
-const builder = new addonBuilder(manifest)
+	"description": "Show the movie or series you are watching on Stremio as your Discord status"
+};
 
-builder.defineStreamHandler((args) => {
+const builder = new addonBuilder(manifest);
+
+builder.defineStreamHandler(async (args) => {
+	console.log("Responding to new stream request...");
+
 	const { type: itemType, id: itemIdFull } = args;
-
-	const baseUrl = "https://cinemeta-live.strem.io/meta";
-
-	let url = "";
 	const imdbId = itemIdFull.split(":")[0];
-	let seasonNumber;
-	let episodeNumber;
+	const url = `https://cinemeta-live.strem.io/meta/${itemType}/${imdbId}.json`;
 
-	if (itemType === "movie") {
-		url = `${baseUrl}/movie/${imdbId}.json`;
-		console.log(`Fetching movie metadata from ${url}`);
-
-		if (url) {
-			needle.get(url, (err, resp, body) => {
-				if (body && body.meta) {
-					setActivity(body.meta.name, itemType);
-				} else {
-					console.error("Invalid body or body.meta is missing.");
-				}
-			});
+	try {
+		const metaData = await fetchMetadata(url);
+		const itemTitle = metaData?.name;
+		if (itemType === "movie") {
+			setActivity(itemTitle, itemType);
 		}
+		else if (itemType === "series") {
+			const seasonNumber = itemIdFull.split(":")[1];
+			const episodeNumber = itemIdFull.split(":")[2];
 
-	} else if (itemType === "series") {
-		seasonNumber = itemIdFull.split(":")[1]
-		episodeNumber = itemIdFull.split(":")[2]
-		url = `${baseUrl}/series/${imdbId}.json`;
-		console.log(`Fetching series metadata from ${url}`);
+			const episodeArray = metaData.videos;
+			const episodeBeingWatched = episodeArray.find(video => video.id === itemIdFull);
 
-		if (url) {
-			needle.get(url, (err, resp, body) => {
-				if (body && body.meta) {
-					const episodeArray = body.meta.videos;
-					const episode = episodeArray.find(video => video.id === itemIdFull);
-					if (episode) {  // Check if episode is found
-						// Use `title` if available, otherwise `name`
-						const episodeTitle = episode.title || episode.name;
-						setActivity(body.meta.name, itemType, seasonNumber, episodeNumber, episodeTitle);
-					} else {
-						console.error(`Episode with ID ${itemIdFull} not found.`);
-					}
-				} else {
-					console.error("Invalid body or body.meta is missing.");
-				}
-			});
+			if (episodeBeingWatched) {
+				const episodeTitle = episodeBeingWatched.title || episodeBeingWatched.name;
+				setActivity(itemTitle, itemType, seasonNumber, episodeNumber, episodeTitle);
+			} else {
+				console.error(`Episode with ID ${itemIdFull} not found.`);
+			}
 		}
+	} catch (error) {
+		console.error("Failed to fetch metadata:", error);
 	}
 
 	return Promise.resolve({ streams: [] });
 });
 
-module.exports = builder.getInterface()
+async function fetchMetadata(url) {
+	console.log(`Fetching series metadata from ${url}`);
+	try {
+		const response = await needle("get", url);
+		return response.body.meta;
+	} catch (error) {
+		console.error("Error fetching metadata:", error);
+		return null;
+	}
+}
+
+module.exports = builder.getInterface();
