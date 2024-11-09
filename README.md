@@ -1,6 +1,5 @@
 # Stremio - Discord Rich Presence
 Addon for [Stremio](https://www.stremio.com/) to show the movie or series you are watching as your Discord status.
-This
 
 # How to use
 Stremio addons are hosted as Nodejs applications.
