@@ -21,7 +21,10 @@ const manifest = {
 const builder = new addonBuilder(manifest);
 
 builder.defineStreamHandler(async (args) => {
-	console.log("Responding to new stream request...");
+	// Only movies and series are supported as a Discord status, so return if the stream is not for one of those types
+	if (args.type !== "movie" && args.type !== "series") {
+		return Promise.resolve({ streams: [] });
+	}
 
 	const { type: itemType, id: itemIdFull } = args;
 	const imdbId = itemIdFull.split(":")[0];
@@ -55,7 +58,7 @@ builder.defineStreamHandler(async (args) => {
 });
 
 async function fetchMetadata(url) {
-	console.log(`Fetching series metadata from ${url}`);
+	console.log(`Fetching metadata from ${url}`);
 	try {
 		const response = await needle("get", url);
 		return response.body.meta;
